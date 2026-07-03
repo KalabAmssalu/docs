@@ -1,45 +1,72 @@
 ---
 title: Sandbox testing
-description: Test widget integration with synthetic testimonials.
+description: Test widget embeds with sandbox API clients and widgets before production.
 ---
 
-Sandbox keys (`pk_test_*`) return **deterministic demo reviews** — no production data is read or written.
+Use the **sandbox environment** to develop and QA widget embeds without affecting live review data.
 
-## When to use sandbox
+## Sandbox credentials
 
-- Local development (`http://localhost:*`)
-- Staging / preview deployments
-- CI visual regression tests
-- Developer onboarding before go-live
+Create a sandbox API client in **Integrations → API Clients** with environment set to **Sandbox**.
 
-## Example response shape
+| Credential | Sandbox format |
+| ---------- | -------------- |
+| Publishable key | `pk_test_*` |
+| Secret key | `sk_test_*` |
 
-```json
-{
-  "businessId": "org_abc",
-  "profileUrl": "https://ethioreview.com/sandbox/organizations/org_abc",
-  "averageRating": 4.8,
-  "reviewCount": 5,
-  "environment": "SANDBOX",
-  "reviews": [
-    {
-      "id": "sandbox_rev_1",
-      "stars": 5,
-      "title": "Excellent service",
-      "text": "...",
-      "reviewUrl": "https://ethioreview.com/sandbox/organizations/org_abc/reviews/sandbox_rev_1",
-      "author": { "name": "Hanna T.", "avatar": null }
-    }
-  ]
-}
+Sandbox clients return mock review data from the EthioReview API — no production reviews are exposed.
+
+## Sandbox widgets
+
+Create widgets with environment **Sandbox** in **Integrations → Widgets**.
+
+Rules:
+
+- `pk_test_*` only resolves sandbox widgets
+- `pk_live_*` only resolves production widgets
+- Mixing keys and widget environments returns `403 Forbidden`
+
+## Local development
+
+1. Create a sandbox API client
+2. Add `http://localhost:3000` (and your dev port) to **allowedOrigins**
+3. Create a sandbox widget and copy `widgetId`
+4. Embed with sandbox credentials:
+
+```tsx
+<ReviewWidget
+  baseUrl="https://api.ethioreview.com"
+  publicKey="pk_test_YOUR_KEY"
+  widgetId="YOUR_SANDBOX_WIDGET_ID"
+/>
 ```
 
-## curl test
+## Environment variables
 
 ```bash
-curl -H "X-Widget-Key: pk_test_YOUR_KEY" \
-  -H "Origin: http://localhost:5173" \
-  "https://api.ethioreview.com/api/v1/widgets/businesses/org_abc/reviews?limit=5&minStars=4"
+VITE_ETHIOREVIEW_API_URL=https://api.ethioreview.com
+VITE_ETHIOREVIEW_PUBLIC_KEY=pk_test_YOUR_KEY
+VITE_ETHIOREVIEW_WIDGET_ID=YOUR_SANDBOX_WIDGET_ID
 ```
 
-[Go to production →](/environments)
+```tsx
+import { createReviewWidgetConfig, ReviewWidget } from "@ethioreview/review-widget-react";
+
+const config = createReviewWidgetConfig({
+  baseUrl: import.meta.env.VITE_ETHIOREVIEW_API_URL,
+  publicKey: import.meta.env.VITE_ETHIOREVIEW_PUBLIC_KEY,
+  widgetId: import.meta.env.VITE_ETHIOREVIEW_WIDGET_ID,
+});
+
+<ReviewWidget {...config} />
+```
+
+## Go live
+
+1. Create a production API client (`pk_live_*`)
+2. Add production domains to **allowedOrigins**
+3. Create production widgets or clone sandbox config
+4. Swap env vars to `pk_live_*` and production `widgetId`
+5. Remove sandbox keys from production builds
+
+[Credentials →](/integrations/widget/credentials) · [Widget registry →](/integrations/widget/registry)

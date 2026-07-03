@@ -15,7 +15,9 @@ Import the default stylesheet in your app entry:
 import "@ethioreview/review-widget-react/styles.css";
 ```
 
-## Basic usage
+## Dashboard widget (recommended)
+
+Use `widgetId` from **Integrations → Widgets**. The backend resolves layout, star filter, and limits from your dashboard config.
 
 ```tsx
 import { ReviewWidget } from "@ethioreview/review-widget-react";
@@ -26,27 +28,39 @@ export function Testimonials() {
     <ReviewWidget
       baseUrl="https://api.ethioreview.com"
       publicKey="pk_live_YOUR_KEY"
-      businessId="YOUR_ORG_PROFILE_ID"
-      minStars={4}
-      limit={5}
+      widgetId="YOUR_WIDGET_ID"
     />
   );
 }
 ```
 
-## With registered widget
+`publishableKey` is an alias for `publicKey` (matches the dashboard field name).
 
-Dashboard widget type maps to a layout automatically (`BADGE` → micro badge, `CAROUSEL` → review carousel, etc.).
+## Environment variables
 
-```tsx
-<ReviewWidget
-  baseUrl="https://api.ethioreview.com"
-  publicKey="pk_live_YOUR_KEY"
-  widgetId="widget_abc"
-/>
+```bash
+VITE_ETHIOREVIEW_API_URL=https://api.ethioreview.com
+VITE_ETHIOREVIEW_PUBLIC_KEY=pk_live_YOUR_KEY
+VITE_ETHIOREVIEW_WIDGET_ID=YOUR_WIDGET_ID
 ```
 
-Override the dashboard layout with the `layout` prop:
+```tsx
+import { createReviewWidgetConfig, ReviewWidget } from "@ethioreview/review-widget-react";
+
+const config = createReviewWidgetConfig({
+  baseUrl: import.meta.env.VITE_ETHIOREVIEW_API_URL,
+  publicKey: import.meta.env.VITE_ETHIOREVIEW_PUBLIC_KEY,
+  widgetId: import.meta.env.VITE_ETHIOREVIEW_WIDGET_ID,
+});
+
+export function Testimonials() {
+  return <ReviewWidget {...config} />;
+}
+```
+
+## Manual layout (no registry widget)
+
+For custom pages without a dashboard widget record:
 
 ```tsx
 <ReviewWidget
@@ -54,7 +68,35 @@ Override the dashboard layout with the `layout` prop:
   publicKey="pk_live_YOUR_KEY"
   businessId="YOUR_ORG_PROFILE_ID"
   layout="trust-score"
+  minStars={4}
+  limit={5}
 />
+```
+
+## Override dashboard layout
+
+```tsx
+<ReviewWidget
+  baseUrl="https://api.ethioreview.com"
+  publicKey="pk_live_YOUR_KEY"
+  widgetId="YOUR_WIDGET_ID"
+  layout="hero-banner"
+/>
+```
+
+## Copy embed snippet
+
+```ts
+import { buildReactEmbedSnippet } from "@ethioreview/review-widget-core";
+
+console.log(
+  buildReactEmbedSnippet({
+    baseUrl: "https://api.ethioreview.com",
+    publicKey: "pk_live_YOUR_KEY",
+    widgetId: "YOUR_WIDGET_ID",
+    useEnvVars: true,
+  }),
+);
 ```
 
 ## Components
@@ -64,6 +106,7 @@ Browse the full [widget components](/integrations/widget/components) catalog, or
 | Export | Purpose |
 | ------ | ------- |
 | `ReviewWidget` | Data-fetching container with auto or explicit layout |
+| `createReviewWidgetConfig` | Typed config from env vars or dashboard values |
 | `HeroReviewBanner` | Full-width hero with CTA |
 | `TrustScoreSummary` | Centered score summary |
 | `RatingBreakdownCard` | Per-star distribution bars |
@@ -76,10 +119,7 @@ Browse the full [widget components](/integrations/widget/components) catalog, or
 | `VerifiedBusinessCard` | Trust badge card |
 | `FloatingBadge` | Sticky corner badge |
 | `DarkPromoCard` | High-contrast promo card |
-| `TestimonialCard` | Single review list item (legacy) |
-| `RatingSummary` | Plain aggregate header (legacy) |
-| `ReviewList` | List of testimonial cards (legacy) |
 
 Each review includes `reviewUrl` for navigation to EthioReview.
 
-[Next.js SSR →](/sdks/review-widget/overview#nextjs)
+[Credentials →](/integrations/widget/credentials) · [Widget registry →](/integrations/widget/registry) · [Next.js SSR →](/sdks/review-widget/overview#nextjs)

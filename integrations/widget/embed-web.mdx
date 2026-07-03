@@ -1,12 +1,45 @@
 ---
 title: Web Component embed
-description: Drop-in HTML embed with review-widget custom element.
+description: Embed EthioReview reviews on any HTML site with the review-widget custom element.
 ---
 
-## Snippet
+## Install
+
+```bash
+npm install @ethioreview/review-widget-web-vanilla
+```
+
+Or load from CDN (when published):
 
 ```html
-<script async src="https://cdn.ethioreview.com/widget.js"></script>
+<script async src="https://cdn.ethioreview.com/widget/v1/review-widget.js"></script>
+```
+
+## Register the element
+
+```ts
+import { registerReviewWidget } from "@ethioreview/review-widget-web-vanilla";
+
+registerReviewWidget();
+```
+
+## Dashboard widget (recommended)
+
+Pass `data-widget-id` so the backend resolves layout and filters from the registry:
+
+```html
+<review-widget
+  data-base-url="https://api.ethioreview.com"
+  data-public-key="pk_live_YOUR_KEY"
+  data-widget-id="YOUR_WIDGET_ID"
+></review-widget>
+```
+
+`data-publishable-key` is an alias for `data-public-key`.
+
+## Manual organization embed
+
+```html
 <review-widget
   data-base-url="https://api.ethioreview.com"
   data-public-key="pk_live_YOUR_KEY"
@@ -15,36 +48,37 @@ description: Drop-in HTML embed with review-widget custom element.
 ></review-widget>
 ```
 
-## Attributes
+## Copy-paste snippet
 
-| Attribute | Required | Description |
-| --------- | -------- | ----------- |
-| `data-base-url` | Yes | API base URL |
-| `data-public-key` | Yes | Publishable key (`pk_*`) |
-| `data-business-id` | Yes* | Organization profile ID |
-| `data-widget-id` | Yes* | Registered widget ID (alternative to business-id) |
-| `data-limit` | No | Max reviews (default 5) |
+```ts
+import { buildScriptEmbedSnippet } from "@ethioreview/review-widget-web-vanilla";
 
-*Provide either `data-business-id` or `data-widget-id`.
+const html = buildScriptEmbedSnippet({
+  scriptUrl: "https://cdn.ethioreview.com/widget/v1/review-widget.js",
+  host: "https://api.ethioreview.com",
+  publicKey: "pk_live_YOUR_KEY",
+  widgetId: "YOUR_WIDGET_ID",
+});
+```
 
-## Click-through behavior
+## Telemetry events
 
-Each testimonial is wrapped in a link to the EthioReview review page. Clicks emit a `widget-telemetry` custom event with `type: "onInteraction"`.
+Listen for custom events on the element:
 
-```javascript
-document.querySelector("review-widget").addEventListener("widget-telemetry", (e) => {
+```js
+document.querySelector("review-widget")?.addEventListener("widget-telemetry", (e) => {
   console.log(e.detail);
 });
 ```
 
-## WordPress
+Events: `onLoad`, `onError`, `onInteraction`.
 
-```
-[ethioreview_widget biz="org_123" key="pk_live_..."]
-```
+## Requirements
 
-## Shopify
+- Publishable key from **Integrations → API Clients**
+- Your site domain in the API client **allowedOrigins** list
+- For `data-widget-id`: a matching widget in **Integrations → Widgets**
 
-Add the Liquid snippet from **Integrations → Widgets → Copy embed** in your theme.
+For styled layout components (hero banner, trust score, etc.), use the [React embed](/integrations/widget/embed-react) or compose [layout components](/integrations/widget/components) directly.
 
-[React embed →](/integrations/widget/embed-react)
+[Credentials →](/integrations/widget/credentials) · [Widget registry →](/integrations/widget/registry)
