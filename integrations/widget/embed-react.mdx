@@ -9,10 +9,17 @@ description: ReviewWidget component for React applications.
 npm install @ethioreview/review-widget-react @ethioreview/review-widget-core
 ```
 
+Import the default stylesheet in your app entry:
+
+```tsx
+import "@ethioreview/review-widget-react/styles.css";
+```
+
 ## Basic usage
 
 ```tsx
 import { ReviewWidget } from "@ethioreview/review-widget-react";
+import "@ethioreview/review-widget-react/styles.css";
 
 export function Testimonials() {
   return (
@@ -29,6 +36,8 @@ export function Testimonials() {
 
 ## With registered widget
 
+Dashboard widget type maps to a layout automatically (`BADGE` → micro badge, `CAROUSEL` → review carousel, etc.).
+
 ```tsx
 <ReviewWidget
   baseUrl="https://api.ethioreview.com"
@@ -37,14 +46,39 @@ export function Testimonials() {
 />
 ```
 
+Override the dashboard layout with the `layout` prop:
+
+```tsx
+<ReviewWidget
+  baseUrl="https://api.ethioreview.com"
+  publicKey="pk_live_YOUR_KEY"
+  businessId="YOUR_ORG_PROFILE_ID"
+  layout="trust-score"
+/>
+```
+
 ## Components
+
+Browse the full [widget components](/integrations/widget/components) catalog, or open the [component gallery](/integrations/widget/component-gallery) for **live UI previews** of all 12 layouts.
 
 | Export | Purpose |
 | ------ | ------- |
-| `ReviewWidget` | Full widget (rating + list) |
-| `TestimonialCard` | Single review card with link |
-| `RatingSummary` | Aggregate rating header |
-| `ReviewList` | List of testimonial cards |
+| `ReviewWidget` | Data-fetching container with auto or explicit layout |
+| `HeroReviewBanner` | Full-width hero with CTA |
+| `TrustScoreSummary` | Centered score summary |
+| `RatingBreakdownCard` | Per-star distribution bars |
+| `VerticalStackedCard` | Sidebar-style card |
+| `MicroBadge` | Compact inline badge |
+| `InlineRatingPill` | Minimal footer/nav pill |
+| `ReviewCarouselCard` | Featured review quotes grid |
+| `ComparisonStrip` | KPI stat strip |
+| `CircularScoreWidget` | Radial score gauge |
+| `VerifiedBusinessCard` | Trust badge card |
+| `FloatingBadge` | Sticky corner badge |
+| `DarkPromoCard` | High-contrast promo card |
+| `TestimonialCard` | Single review list item (legacy) |
+| `RatingSummary` | Plain aggregate header (legacy) |
+| `ReviewList` | List of testimonial cards (legacy) |
 
 Each review includes `reviewUrl` for navigation to EthioReview.
 

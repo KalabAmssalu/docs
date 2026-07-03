@@ -52,6 +52,8 @@
             "icon": "code",
             "pages": [
               "integrations/widget/overview",
+              "integrations/widget/components",
+              "integrations/widget/component-gallery",
               "integrations/widget/credentials",
               "integrations/widget/embed-web",
               "integrations/widget/embed-react",
@@ -135,6 +137,7 @@
     ]
   },
   "footer": {},
+  "css": "style.css",
   "openapi": "openapi.json",
   "api": {
     "baseUrl": "https://api.ethioreview.com/api/v1",

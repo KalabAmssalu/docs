@@ -7,7 +7,8 @@
     "dev": "mintlify dev",
     "broken-links": "mintlify broken-links",
     "sync:openapi": "node scripts/sync-openapi.mjs",
-    "sync:sources": "node scripts/sync-openapi.mjs"
+    "sync:sources": "node scripts/sync-openapi.mjs",
+    "sync:widget-previews": "node scripts/fix-preview-styles.mjs && node scripts/split-widget-previews.mjs"
   },
   "devDependencies": {
     "mintlify": "^4.2.15"

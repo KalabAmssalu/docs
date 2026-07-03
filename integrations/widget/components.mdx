@@ -1,0 +1,187 @@
+---
+title: Widget components
+description: Rating display layouts you can embed with the React SDK or customize for your brand.
+---
+
+EthioReview ships **12 rating display layouts** — badges, breakdowns, summaries, and hero banners. Each layout is a drop-in component that accepts the same review aggregate data from the widget API.
+
+Use this catalog to pick the layout that fits your page. Configure the closest match in the dashboard (**Integrations → Widgets**), or compose layouts directly with `@ethioreview/review-widget-react`.
+
+<Card title="Browse live UI previews" icon="images" href="/integrations/widget/component-gallery">
+  Open the **component gallery** to see all 12 layouts rendered with sample rating data.
+</Card>
+
+## Shared data shape
+
+Every layout accepts a `ReviewAggregateData` object:
+
+```typescript
+type ReviewAggregateData = {
+  score: number;           // average rating, e.g. 4.8
+  totalReviews: number;    // total verified review count
+  distribution: {
+    5: number;
+    4: number;
+    3: number;
+    2: number;
+    1: number;
+  };
+};
+```
+
+Fetch this from `GET /widgets/businesses/{orgId}/rating` or `GET /widgets/resolve/{widgetId}` with your publishable key.
+
+## Quick reference
+
+<CardGroup cols={2}>
+
+<Card title="Hero review banner" icon="rectangle-ad" href="#hero-banner">
+  Landing pages and homepage hero sections. Layout key: `hero-banner`
+</Card>
+
+<Card title="TrustScore summary" icon="star" href="#trust-score">
+  Above-the-fold headers and product detail pages. Layout key: `trust-score`
+</Card>
+
+<Card title="Rating breakdown card" icon="chart-bar" href="#rating-breakdown">
+  Transparency sections with per-star bars. Layout key: `rating-breakdown`
+</Card>
+
+<Card title="Vertical stacked card" icon="sidebar" href="#vertical-stacked">
+  Sidebars and narrow columns. Layout key: `vertical-stacked`
+</Card>
+
+<Card title="Micro badge" icon="certificate" href="#micro-badge">
+  Inline placement next to product names. Layout key: `micro-badge`
+</Card>
+
+<Card title="Inline rating pill" icon="tag" href="#inline-pill">
+  Footers, product cards, nav bars. Layout key: `inline-pill`
+</Card>
+
+<Card title="Review carousel card" icon="messages" href="#review-carousel">
+  Testimonial sections with featured quotes. Layout key: `review-carousel`
+</Card>
+
+<Card title="Comparison strip" icon="table-columns" href="#comparison-strip">
+  KPI rows and analytics panels. Layout key: `comparison-strip`
+</Card>
+
+<Card title="Circular score" icon="gauge-high" href="#circular-score">
+  Dashboards and stat panels. Layout key: `circular-score`
+</Card>
+
+<Card title="Verified business card" icon="shield-check" href="#verified-business">
+  Trust badges and checkout pages. Layout key: `verified-business`
+</Card>
+
+<Card title="Floating badge" icon="location-dot" href="#floating-badge">
+  Sticky corner placement. Layout key: `floating-badge`
+</Card>
+
+<Card title="Dark promo card" icon="moon" href="#dark-promo">
+  Marketing pages and dark sections. Layout key: `dark-promo`
+</Card>
+
+</CardGroup>
+
+## Layout reference
+
+| Component | Export | Layout key | Footprint | Shows breakdown | Shows testimonials | CTA |
+| --------- | ------ | ---------- | --------- | --------------- | ------------------ | --- |
+| Hero review banner | `HeroReviewBanner` | `hero-banner` | Wide | No | No | Yes |
+| TrustScore summary | `TrustScoreSummary` | `trust-score` | Medium | No | No | No |
+| Rating breakdown card | `RatingBreakdownCard` | `rating-breakdown` | Narrow | Yes | No | No |
+| Vertical stacked card | `VerticalStackedCard` | `vertical-stacked` | Narrow | Yes | No | No |
+| Micro badge | `MicroBadge` | `micro-badge` | Compact | No | No | No |
+| Inline rating pill | `InlineRatingPill` | `inline-pill` | Compact | No | No | No |
+| Review carousel card | `ReviewCarouselCard` | `review-carousel` | Wide | No | Yes | No |
+| Comparison strip | `ComparisonStrip` | `comparison-strip` | Wide | No | No | No |
+| Circular score | `CircularScoreWidget` | `circular-score` | Small | No | No | No |
+| Verified business card | `VerifiedBusinessCard` | `verified-business` | Medium | No | No | Yes |
+| Floating badge | `FloatingBadge` | `floating-badge` | Compact | No | No | No |
+| Dark promo card | `DarkPromoCard` | `dark-promo` | Medium | No | No | Yes |
+| Default list | `ReviewWidget` | `default` | Medium | No | Yes | Optional |
+
+## Dashboard widget types
+
+When you register a widget in the dashboard, choose the type closest to your target layout:
+
+| Dashboard type | Suggested layouts |
+| -------------- | ----------------- |
+| `BADGE` | Micro badge, Inline rating pill, Floating badge |
+| `TESTIMONIAL` | Review carousel card, Hero review banner |
+| `CAROUSEL` | Review carousel card |
+| `GRID` | Review carousel card, Verified business card |
+| `LIST` | Review carousel card, Rating breakdown card |
+
+Set **min stars**, **limit**, and theme colors in the widget config JSON. See [Widget registry](/integrations/widget/registry) for API details.
+
+## React usage
+
+Import the stylesheet once in your app entry:
+
+```tsx
+import "@ethioreview/review-widget-react/styles.css";
+```
+
+### Auto layout from dashboard widget
+
+`ReviewWidget` picks a layout from your registered widget type, or you can override with the `layout` prop:
+
+```tsx
+import { ReviewWidget } from "@ethioreview/review-widget-react";
+import "@ethioreview/review-widget-react/styles.css";
+
+export function TrustSection() {
+  return (
+    <ReviewWidget
+      baseUrl="https://api.ethioreview.com"
+      publicKey="pk_live_YOUR_KEY"
+      widgetId="widget_abc"
+    />
+  );
+}
+```
+
+### Pick a layout explicitly
+
+```tsx
+<ReviewWidget
+  baseUrl="https://api.ethioreview.com"
+  publicKey="pk_live_YOUR_KEY"
+  businessId="YOUR_ORG_PROFILE_ID"
+  layout="hero-banner"
+  minStars={4}
+  limit={5}
+/>
+```
+
+### Compose a layout with your own data
+
+```tsx
+import {
+  HeroReviewBanner,
+  toReviewAggregateData,
+} from "@ethioreview/review-widget-react";
+import "@ethioreview/review-widget-react/styles.css";
+
+const data = toReviewAggregateData({
+  averageRating: 4.8,
+  reviewCount: 20921,
+  ratingDistribution: { "5": 16210, "4": 3120, "3": 980, "2": 360, "1": 251 },
+});
+
+export function Hero() {
+  return (
+    <HeroReviewBanner
+      data={data}
+      profileUrl="https://ethioreview.com/organizations/your-slug"
+    />
+  );
+}
+```
+
+The SDK exports all 12 layout components, primitives (`StarTiles`, `RatingBar`, `EthioReviewLogo`), and legacy list helpers (`TestimonialCard`, `RatingSummary`, `ReviewList`).
+
+[React embed guide →](/integrations/widget/embed-react) · [Widget overview →](/integrations/widget/overview)

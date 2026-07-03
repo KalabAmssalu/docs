@@ -5,3 +5,6 @@
 # Draft content
 drafts/
 *.draft.mdx
+
+# Internal widget UI source (reference components, not published pages)
+widgets-ui/
